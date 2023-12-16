@@ -39,12 +39,12 @@ function KeyboardAvoidingTextInput({
       useNativeDriver: true,
     }).start();
   }
-
-  // get the screen height
   useEffect(() => {
+    // get the screen height
     const height = Dimensions.get("screen").height;
     console.log(`screen height: ${height}`);
     screenHeight.current = height;
+    // add listeners for keyboard show and hide
     Keyboard.addListener("keyboardDidShow", onKeyboardShow);
     Keyboard.addListener("keyboardDidHide", onKeyboardHide);
     return () => {
@@ -76,8 +76,9 @@ function KeyboardAvoidingTextInput({
     keyboardHeight.current = event.endCoordinates.height;
   }
   function onKeyboardHide(_) {
+    // _ is a convention for unused variables
     textFieldRef.current.blur();
-    animateDownwards(500);
+    animateDownwards();
   }
 
   return (
