@@ -92,7 +92,7 @@ function KeyboardAvoidingTextInput({
         onFocus={() => {
           if (!initialized.current) {
             initialized.current = true;
-            setTimeout(adjustPosition, 250); // leave a little time for the keyboard the show and calculate the height
+            setTimeout(adjustPosition, 250); // leave a little time for the keyboard to show and calculate the height
             return;
           }
           adjustPosition();
