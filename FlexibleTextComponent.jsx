@@ -8,8 +8,8 @@ import {
 } from "react-native";
 
 function KeyboardAvoidingTextInput({
-  style,
-  placeholder,
+  style = {},
+  placeholder = "default placeholder",
   onChangeText,
   onChange,
   containerStyle = {},
@@ -92,7 +92,8 @@ function KeyboardAvoidingTextInput({
         onFocus={() => {
           if (!initialized.current) {
             initialized.current = true;
-            setTimeout(adjustPosition, 250); // leave a little time for the keyboard to show and calculate the height
+            // leave a little time for the keyboard to show and calculate the height
+            setTimeout(adjustPosition, 250);
             return;
           }
           adjustPosition();

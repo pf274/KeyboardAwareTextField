@@ -10,6 +10,7 @@ export default function App() {
       <KeyboardAvoidingTextInput placeholder={"first one"} style={styles.textField} />
       <KeyboardAvoidingTextInput placeholder={"second one"} style={styles.textField} />
       <KeyboardAvoidingTextInput placeholder={"third one"} style={styles.textField} />
+      <KeyboardAvoidingTextInput placeholder={"fourth one"} style={styles.textField} />
       <StatusBar style="auto" />
     </View>
   );
