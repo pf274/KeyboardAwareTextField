@@ -43,7 +43,7 @@ function KeyboardAvoidingTextInput({
   useEffect(() => {
     // get the screen height
     const height = Dimensions.get("screen").height;
-    console.log(`screen height: ${height}`);
+    // console.log(`screen height: ${height}`);
     screenHeight.current = height;
     // add listeners for keyboard show and hide
     Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
@@ -64,13 +64,13 @@ function KeyboardAvoidingTextInput({
   }
 
   function adjustPosition() {
-    console.log(`keyboard height: ${keyboardHeight.current}`);
+    // console.log(`keyboard height: ${keyboardHeight.current}`);
     const topOfKeyboard = screenHeight.current - keyboardHeight.current;
-    console.log(`top of keyboard: ${topOfKeyboard}`);
-    console.log(`bottom of component: ${containerBottom.current}`);
+    // console.log(`top of keyboard: ${topOfKeyboard}`);
+    // console.log(`bottom of component: ${containerBottom.current}`);
     const adjust =
       topOfKeyboard - containerBottom.current - containerHeight.current;
-    console.log(`adjust: ${adjust}`);
+    // console.log(`adjust: ${adjust}`);
     if (adjust < 0) {
       animateUpwards(adjust);
     }
