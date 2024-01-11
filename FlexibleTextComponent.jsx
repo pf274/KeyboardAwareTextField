@@ -106,7 +106,10 @@ function KeyboardAvoidingTextInput({
           (resolve) => (keyboardShowPromise.current.resolve = resolve)
         );
       }
+      const before = Date.now();
       await keyboardShowPromise.current.promise;
+      const after = Date.now();
+      console.log(`Waited for the keyboard for ${after - before}ms`);
     }
     adjustPosition();
   }
