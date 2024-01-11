@@ -23,6 +23,7 @@ function KeyboardAvoidingTextInput({
   const containerRef = useRef();
   const textFieldRef = useRef();
   const initialized = useRef(false);
+  const keyboardShowPromise = useRef({ promise: null, resolve: null });
 
   function animateUpwards(targetValue, duration = 100) {
     Animated.timing(translateY, {
@@ -45,11 +46,14 @@ function KeyboardAvoidingTextInput({
     console.log(`screen height: ${height}`);
     screenHeight.current = height;
     // add listeners for keyboard show and hide
-    Keyboard.addListener("keyboardDidShow", onKeyboardShow);
-    Keyboard.addListener("keyboardDidHide", onKeyboardHide);
+    Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
+    Keyboard.addListener("keyboardDidHide", handleKeyboardHide);
     return () => {
       Keyboard.removeAllListeners("keyboardDidShow");
       Keyboard.removeAllListeners("keyboardDidHide");
+      if (keyboardShowPromise.current) {
+        keyboardShowPromise.current = null;
+      }
     };
   }, []);
 
@@ -72,13 +76,39 @@ function KeyboardAvoidingTextInput({
     }
   }
 
-  function onKeyboardShow(event) {
+  function handleKeyboardShow(event) {
     keyboardHeight.current = event.endCoordinates.height;
+
+    if (!keyboardShowPromise.current.promise) {
+      keyboardShowPromise.current.promise = new Promise((resolve) => {
+        keyboardShowPromise.current.resolve = resolve;
+      });
+    }
+
+    if (keyboardShowPromise.current.resolve) {
+      keyboardShowPromise.current.resolve();
+      keyboardShowPromise.current.resolve = null;
+      keyboardShowPromise.current.promise = null;
+    }
   }
-  function onKeyboardHide(_) {
+  function handleKeyboardHide(_) {
     // _ is a convention for unused variables
     textFieldRef.current.blur();
     animateDownwards();
+  }
+
+  async function handleFocus() {
+    if (!initialized.current && keyboardHeight.current == 0) {
+      initialized.current = true;
+      // wait for the keyboard to show and calculate its height
+      if (!keyboardShowPromise.current.promise) {
+        keyboardShowPromise.current.promise = new Promise(
+          (resolve) => (keyboardShowPromise.current.resolve = resolve)
+        );
+      }
+      await keyboardShowPromise.current.promise;
+    }
+    adjustPosition();
   }
 
   return (
@@ -90,15 +120,7 @@ function KeyboardAvoidingTextInput({
       <TextInput
         placeholder={placeholder}
         style={style}
-        onFocus={() => {
-          if (!initialized.current) {
-            initialized.current = true;
-            // leave a little time for the keyboard to show and calculate the height
-            setTimeout(adjustPosition, 250);
-            return;
-          }
-          adjustPosition();
-        }}
+        onFocus={handleFocus}
         onBlur={animateDownwards}
         ref={textFieldRef}
         onChangeText={onChangeText}
