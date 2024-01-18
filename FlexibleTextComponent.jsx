@@ -5,7 +5,6 @@ import {
   Dimensions,
   Animated,
   useAnimatedValue,
-  View,
 } from "react-native";
 
 const overlayColor = '#000000';
