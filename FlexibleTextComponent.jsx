@@ -5,7 +5,10 @@ import {
   Dimensions,
   Animated,
   useAnimatedValue,
+  View,
 } from "react-native";
+
+const overlayColor = '#000000';
 
 function KeyboardAvoidingTextInput({
   style = {},
@@ -14,12 +17,14 @@ function KeyboardAvoidingTextInput({
   onChange,
   containerStyle = {},
   value = "",
+  overlay = true,
 }) {
   const keyboardHeight = useRef(0);
   const screenHeight = useRef(0);
   const containerBottom = useRef(0);
   const containerHeight = useRef(0);
   const translateY = useAnimatedValue(0);
+  const overlayOpacity = useAnimatedValue(0);
   const containerRef = useRef();
   const textFieldRef = useRef();
   const initialized = useRef(false);
@@ -31,10 +36,20 @@ function KeyboardAvoidingTextInput({
       duration,
       useNativeDriver: true,
     }).start();
+    Animated.timing(overlayOpacity, {
+      toValue: 0.5,
+      duration,
+      useNativeDriver: true,
+    }).start();
   }
 
   function animateDownwards() {
     Animated.timing(translateY, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(overlayOpacity, {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
@@ -52,7 +67,7 @@ function KeyboardAvoidingTextInput({
       Keyboard.removeAllListeners("keyboardDidShow");
       Keyboard.removeAllListeners("keyboardDidHide");
       if (keyboardShowPromise.current) {
-        keyboardShowPromise.current = null;
+        keyboardShowPromise.current = { promise: null, resolve: null };
       }
     };
   }, []);
@@ -79,7 +94,7 @@ function KeyboardAvoidingTextInput({
   function handleKeyboardShow(event) {
     keyboardHeight.current = event.endCoordinates.height;
 
-    if (!keyboardShowPromise.current.promise) {
+    if (!keyboardShowPromise.current?.promise) {
       keyboardShowPromise.current.promise = new Promise((resolve) => {
         keyboardShowPromise.current.resolve = resolve;
       });
@@ -115,23 +130,48 @@ function KeyboardAvoidingTextInput({
   }
 
   return (
-    <Animated.View
-      style={[containerStyle, { transform: [{ translateY }] }]}
-      ref={containerRef}
-      onLayout={calculateComponentBottom}
-    >
-      <TextInput
-        placeholder={placeholder}
-        style={style}
-        onFocus={handleFocus}
-        onBlur={animateDownwards}
-        ref={textFieldRef}
-        onChangeText={onChangeText}
-        onChange={onChange}
-        value={onChangeText || onChange ? value : undefined}
-      />
-    </Animated.View>
+      
+      <Animated.View
+        style={[containerStyle, { transform: [{ translateY }] }]}
+        ref={containerRef}
+        onLayout={calculateComponentBottom}
+      >
+        {overlay && <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              width: Dimensions.get('screen').width * 2,
+              height: Dimensions.get('screen').height * 2,
+              backgroundColor: overlayColor,
+              opacity: overlayOpacity,
+              pointerEvents: 'none',
+            },
+            {
+              transform: [
+                {
+                  translateX: Dimensions.get('screen').width * -1
+                },
+                {
+                  translateY: Dimensions.get('screen').height * -1
+                }
+              ]
+            }
+          ]}
+        />}
+        <TextInput
+          placeholder={placeholder}
+          style={style}
+          onFocus={handleFocus}
+          onBlur={animateDownwards}
+          ref={textFieldRef}
+          onChangeText={onChangeText}
+          onChange={onChange}
+          value={onChangeText || onChange ? value : undefined}
+        />
+      </Animated.View>
   );
 }
+
+
 
 export default KeyboardAvoidingTextInput;
