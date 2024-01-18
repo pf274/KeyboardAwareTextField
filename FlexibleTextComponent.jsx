@@ -148,10 +148,10 @@ function KeyboardAvoidingTextInput({
             {
               transform: [
                 {
-                  translateX: Dimensions.get('screen').width * -1
+                  translateX: Dimensions.get('screen').width * -0.5
                 },
                 {
-                  translateY: Dimensions.get('screen').height * -1
+                  translateY: Dimensions.get('screen').height * -0.5
                 }
               ]
             }
